@@ -1,0 +1,44 @@
+syntax = "proto3";
+
+package account;
+
+option go_package = "src/api/v1/account";
+
+message Account {
+  string id = 1;
+  string email = 2;
+}
+
+service AccountSvc {
+  rpc Create(CreateRequest) returns (CreateResponse) {}
+  rpc Authenticate(AuthenticateRequest) returns (AuthenticateResponse) {}
+  rpc Get(GetRequest) returns (GetResponse) {}
+}
+
+// Requests
+message CreateRequest {
+  string email = 1;
+}
+
+message AuthenticateRequest {
+  string email = 1;
+}
+
+message GetRequest {
+  Account account = 1;
+}
+
+// Responses
+message CreateResponse {
+  bool success = 1;
+  Account account = 2;
+}
+
+message AuthenticateResponse {
+  bool success = 1;
+  Account account = 2;
+}
+
+message GetResponse {
+  Account account = 1;
+}
