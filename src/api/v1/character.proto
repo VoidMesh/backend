@@ -1,0 +1,53 @@
+syntax = "proto3";
+
+package v1;
+
+option go_package = "github.com/VoidMesh/backend/src/api/v1;v1";
+
+// Character type definition.
+message Character {
+  string id = 1;
+  string name = 2;
+}
+
+// The character service definition.
+service CharacterService {
+  rpc CreateCharacter (CreateCharacterRequest) returns (CreateCharacterResponse) {}
+  rpc ReadCharacter (ReadCharacterRequest) returns (ReadCharacterResponse) {}
+  rpc UpdateCharacter (UpdateCharacterRequest) returns (UpdateCharacterResponse) {}
+  rpc DeleteCharacter (DeleteCharacterRequest) returns (DeleteCharacterResponse) {}
+}
+
+// Character requests.
+message CreateCharacterRequest {
+  Character character = 1;
+}
+
+message ReadCharacterRequest {
+  Character character = 1;
+}
+
+message UpdateCharacterRequest {
+  Character character = 1;
+}
+
+message DeleteCharacterRequest {
+  Character character = 1;
+}
+
+// Character responses.
+message CreateCharacterResponse {
+  Character character = 1;
+}
+
+message ReadCharacterResponse {
+  Character character = 1;
+}
+
+message UpdateCharacterResponse {
+  Character character = 1;
+}
+
+message DeleteCharacterResponse {
+  Character character = 1;
+}
