@@ -1,0 +1,40 @@
+syntax = "proto3";
+
+package resource;
+
+option go_package = "src/api/v1/resource";
+
+message Resource {
+  string id = 1;
+  string name = 2;
+  string description = 3;
+}
+
+service ResourceSvc {
+  rpc List (ListRequest) returns (ListReponse) {}
+  rpc Get (GetRequest) returns (GetResponse) {}
+  rpc Obtain (ObtainRequest) returns (ObtainResponse) {}
+}
+
+message ListRequest {}
+
+message GetRequest {
+  Resource resource = 1;
+}
+
+message ObtainRequest {
+  Resource resource = 1;
+}
+
+message ListReponse {
+  repeated Resource resources = 1;
+}
+
+message GetResponse {
+  Resource resource = 1;
+}
+
+message ObtainResponse {
+  Resource resource = 1;
+  float amount = 2;
+}

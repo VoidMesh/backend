@@ -1,0 +1,50 @@
+syntax = "proto3";
+
+package character;
+
+option go_package = "src/api/v1/character";
+
+message Character {
+  string id = 1;
+  string name = 2;
+}
+
+service CharacterSvc {
+  rpc Create (CreateRequest) returns (CreateResponse) {}
+  rpc Read (ReadRequest) returns (ReadResponse) {}
+  rpc Update (UpdateRequest) returns (UpdateResponse) {}
+  rpc Delete (DeleteRequest) returns (DeleteResponse) {}
+}
+
+message CreateRequest {
+  Character character = 1;
+}
+
+message ReadRequest {
+  Character character = 1;
+}
+
+message UpdateRequest {
+  Character character = 1;
+}
+
+message DeleteRequest {
+  Character character = 1;
+}
+
+// Character responses.
+message CreateResponse {
+  Character character = 1;
+}
+
+message ReadResponse {
+  Character character = 1;
+}
+
+message UpdateResponse {
+  Character character = 1;
+}
+
+message DeleteResponse {
+  Character character = 1;
+}
