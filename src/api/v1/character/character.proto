@@ -2,11 +2,14 @@ syntax = "proto3";
 
 package character;
 
-option go_package = "src/api/v1/character";
+import "src/api/v1/resource/resource.proto";
+
+option go_package = "github.com/VoidMesh/backend/src/api/v1/character";
 
 message Character {
   string id = 1;
   string name = 2;
+  repeated resource.Resource resources = 3;
 }
 
 service CharacterSvc {
@@ -47,4 +50,5 @@ message UpdateResponse {
 
 message DeleteResponse {
   Character character = 1;
+  bool deleted = 2;
 }
