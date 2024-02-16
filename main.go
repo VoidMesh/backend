@@ -4,9 +4,10 @@ import (
 	"log"
 	"net"
 
-	apb "github.com/VoidMesh/backend/src/api/v1/account"
-	cpb "github.com/VoidMesh/backend/src/api/v1/character"
-	rpb "github.com/VoidMesh/backend/src/api/v1/resource"
+	"github.com/VoidMesh/backend/src/api/v1/account"
+	"github.com/VoidMesh/backend/src/api/v1/character"
+	"github.com/VoidMesh/backend/src/api/v1/resource"
+	"github.com/VoidMesh/backend/src/server"
 
 	"google.golang.org/grpc"
 )
@@ -19,9 +20,9 @@ func main() {
 
 	s := grpc.NewServer()
 
-	apb.RegisterAccountSvcServer(s, &AccountServer{})
-	cpb.RegisterCharacterSvcServer(s, &CharacterServer{})
-	rpb.RegisterResourceSvcServer(s, &ResourceServer{})
+	account.RegisterAccountSvcServer(s, &server.AccountServer{})
+	character.RegisterCharacterSvcServer(s, &server.CharacterServer{})
+	resource.RegisterResourceSvcServer(s, &server.ResourceServer{})
 
 	log.Printf("server listening at %v", lis.Addr())
 	if err := s.Serve(lis); err != nil {

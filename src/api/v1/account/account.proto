@@ -2,11 +2,14 @@ syntax = "proto3";
 
 package account;
 
-option go_package = "src/api/v1/account";
+import "src/api/v1/character/character.proto";
+
+option go_package = "github.com/VoidMesh/backend/src/api/v1/account";
 
 message Account {
   string id = 1;
   string email = 2;
+  repeated character.Character characters = 3;
 }
 
 service AccountSvc {
