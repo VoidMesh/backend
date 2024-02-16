@@ -19,10 +19,11 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	CharacterSvc_Create_FullMethodName = "/character.CharacterSvc/Create"
-	CharacterSvc_Read_FullMethodName   = "/character.CharacterSvc/Read"
-	CharacterSvc_Update_FullMethodName = "/character.CharacterSvc/Update"
-	CharacterSvc_Delete_FullMethodName = "/character.CharacterSvc/Delete"
+	CharacterSvc_Create_FullMethodName         = "/character.CharacterSvc/Create"
+	CharacterSvc_Read_FullMethodName           = "/character.CharacterSvc/Read"
+	CharacterSvc_Update_FullMethodName         = "/character.CharacterSvc/Update"
+	CharacterSvc_Delete_FullMethodName         = "/character.CharacterSvc/Delete"
+	CharacterSvc_GatherResource_FullMethodName = "/character.CharacterSvc/GatherResource"
 )
 
 // CharacterSvcClient is the client API for CharacterSvc service.
@@ -33,6 +34,7 @@ type CharacterSvcClient interface {
 	Read(ctx context.Context, in *ReadRequest, opts ...grpc.CallOption) (*ReadResponse, error)
 	Update(ctx context.Context, in *UpdateRequest, opts ...grpc.CallOption) (*UpdateResponse, error)
 	Delete(ctx context.Context, in *DeleteRequest, opts ...grpc.CallOption) (*DeleteResponse, error)
+	GatherResource(ctx context.Context, in *GatherResourceRequest, opts ...grpc.CallOption) (*GatherResourceResponse, error)
 }
 
 type characterSvcClient struct {
@@ -79,6 +81,15 @@ func (c *characterSvcClient) Delete(ctx context.Context, in *DeleteRequest, opts
 	return out, nil
 }
 
+func (c *characterSvcClient) GatherResource(ctx context.Context, in *GatherResourceRequest, opts ...grpc.CallOption) (*GatherResourceResponse, error) {
+	out := new(GatherResourceResponse)
+	err := c.cc.Invoke(ctx, CharacterSvc_GatherResource_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // CharacterSvcServer is the server API for CharacterSvc service.
 // All implementations must embed UnimplementedCharacterSvcServer
 // for forward compatibility
@@ -87,6 +98,7 @@ type CharacterSvcServer interface {
 	Read(context.Context, *ReadRequest) (*ReadResponse, error)
 	Update(context.Context, *UpdateRequest) (*UpdateResponse, error)
 	Delete(context.Context, *DeleteRequest) (*DeleteResponse, error)
+	GatherResource(context.Context, *GatherResourceRequest) (*GatherResourceResponse, error)
 	mustEmbedUnimplementedCharacterSvcServer()
 }
 
@@ -105,6 +117,9 @@ func (UnimplementedCharacterSvcServer) Update(context.Context, *UpdateRequest) (
 }
 func (UnimplementedCharacterSvcServer) Delete(context.Context, *DeleteRequest) (*DeleteResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Delete not implemented")
+}
+func (UnimplementedCharacterSvcServer) GatherResource(context.Context, *GatherResourceRequest) (*GatherResourceResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GatherResource not implemented")
 }
 func (UnimplementedCharacterSvcServer) mustEmbedUnimplementedCharacterSvcServer() {}
 
@@ -191,6 +206,24 @@ func _CharacterSvc_Delete_Handler(srv interface{}, ctx context.Context, dec func
 	return interceptor(ctx, in, info, handler)
 }
 
+func _CharacterSvc_GatherResource_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GatherResourceRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CharacterSvcServer).GatherResource(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CharacterSvc_GatherResource_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CharacterSvcServer).GatherResource(ctx, req.(*GatherResourceRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // CharacterSvc_ServiceDesc is the grpc.ServiceDesc for CharacterSvc service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -213,6 +246,10 @@ var CharacterSvc_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Delete",
 			Handler:    _CharacterSvc_Delete_Handler,
+		},
+		{
+			MethodName: "GatherResource",
+			Handler:    _CharacterSvc_GatherResource_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

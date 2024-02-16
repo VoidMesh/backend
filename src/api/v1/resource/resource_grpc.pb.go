@@ -19,9 +19,8 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	ResourceSvc_List_FullMethodName   = "/resource.ResourceSvc/List"
-	ResourceSvc_Get_FullMethodName    = "/resource.ResourceSvc/Get"
-	ResourceSvc_Obtain_FullMethodName = "/resource.ResourceSvc/Obtain"
+	ResourceSvc_List_FullMethodName = "/resource.ResourceSvc/List"
+	ResourceSvc_Get_FullMethodName  = "/resource.ResourceSvc/Get"
 )
 
 // ResourceSvcClient is the client API for ResourceSvc service.
@@ -30,7 +29,6 @@ const (
 type ResourceSvcClient interface {
 	List(ctx context.Context, in *ListRequest, opts ...grpc.CallOption) (*ListReponse, error)
 	Get(ctx context.Context, in *GetRequest, opts ...grpc.CallOption) (*GetResponse, error)
-	Obtain(ctx context.Context, in *ObtainRequest, opts ...grpc.CallOption) (*ObtainResponse, error)
 }
 
 type resourceSvcClient struct {
@@ -59,22 +57,12 @@ func (c *resourceSvcClient) Get(ctx context.Context, in *GetRequest, opts ...grp
 	return out, nil
 }
 
-func (c *resourceSvcClient) Obtain(ctx context.Context, in *ObtainRequest, opts ...grpc.CallOption) (*ObtainResponse, error) {
-	out := new(ObtainResponse)
-	err := c.cc.Invoke(ctx, ResourceSvc_Obtain_FullMethodName, in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 // ResourceSvcServer is the server API for ResourceSvc service.
 // All implementations must embed UnimplementedResourceSvcServer
 // for forward compatibility
 type ResourceSvcServer interface {
 	List(context.Context, *ListRequest) (*ListReponse, error)
 	Get(context.Context, *GetRequest) (*GetResponse, error)
-	Obtain(context.Context, *ObtainRequest) (*ObtainResponse, error)
 	mustEmbedUnimplementedResourceSvcServer()
 }
 
@@ -87,9 +75,6 @@ func (UnimplementedResourceSvcServer) List(context.Context, *ListRequest) (*List
 }
 func (UnimplementedResourceSvcServer) Get(context.Context, *GetRequest) (*GetResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Get not implemented")
-}
-func (UnimplementedResourceSvcServer) Obtain(context.Context, *ObtainRequest) (*ObtainResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Obtain not implemented")
 }
 func (UnimplementedResourceSvcServer) mustEmbedUnimplementedResourceSvcServer() {}
 
@@ -140,24 +125,6 @@ func _ResourceSvc_Get_Handler(srv interface{}, ctx context.Context, dec func(int
 	return interceptor(ctx, in, info, handler)
 }
 
-func _ResourceSvc_Obtain_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ObtainRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(ResourceSvcServer).Obtain(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: ResourceSvc_Obtain_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ResourceSvcServer).Obtain(ctx, req.(*ObtainRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 // ResourceSvc_ServiceDesc is the grpc.ServiceDesc for ResourceSvc service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -172,10 +139,6 @@ var ResourceSvc_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Get",
 			Handler:    _ResourceSvc_Get_Handler,
-		},
-		{
-			MethodName: "Obtain",
-			Handler:    _ResourceSvc_Obtain_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
