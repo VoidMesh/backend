@@ -13,16 +13,11 @@ message Resource {
 service ResourceSvc {
   rpc List (ListRequest) returns (ListReponse) {}
   rpc Get (GetRequest) returns (GetResponse) {}
-  rpc Obtain (ObtainRequest) returns (ObtainResponse) {}
 }
 
 message ListRequest {}
 
 message GetRequest {
-  Resource resource = 1;
-}
-
-message ObtainRequest {
   Resource resource = 1;
 }
 
@@ -32,9 +27,4 @@ message ListReponse {
 
 message GetResponse {
   Resource resource = 1;
-}
-
-message ObtainResponse {
-  Resource resource = 1;
-  float amount = 2;
 }

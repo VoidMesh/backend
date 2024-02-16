@@ -9,7 +9,11 @@ option go_package = "github.com/VoidMesh/backend/src/api/v1/character";
 message Character {
   string id = 1;
   string name = 2;
-  repeated resource.Resource resources = 3;
+  Inventory inventory = 3;
+}
+
+message Inventory {
+  map<string, int64> resources = 1; // Resource ID to amount.
 }
 
 service CharacterSvc {
@@ -17,6 +21,8 @@ service CharacterSvc {
   rpc Read (ReadRequest) returns (ReadResponse) {}
   rpc Update (UpdateRequest) returns (UpdateResponse) {}
   rpc Delete (DeleteRequest) returns (DeleteResponse) {}
+
+  rpc GatherResource(GatherResourceRequest) returns (GatherResourceResponse) {}
 }
 
 message CreateRequest {
@@ -24,15 +30,20 @@ message CreateRequest {
 }
 
 message ReadRequest {
-  Character character = 1;
+  string id = 1;
 }
 
 message UpdateRequest {
-  Character character = 1;
+  string id = 1;
 }
 
 message DeleteRequest {
-  Character character = 1;
+  string id = 1;
+}
+
+message GatherResourceRequest {
+  string characterId = 1;
+  resource.Resource resourceToGather = 2;
 }
 
 // Character responses.
@@ -51,4 +62,9 @@ message UpdateResponse {
 message DeleteResponse {
   Character character = 1;
   bool deleted = 2;
+}
+
+message GatherResourceResponse {
+  Character character = 1;
+  Inventory inventory = 2;
 }
