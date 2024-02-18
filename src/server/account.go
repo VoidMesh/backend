@@ -35,13 +35,11 @@ func (s *AccountServer) Authenticate(ctx context.Context, in *account.Authentica
 
 	if _, ok := Accounts[in.Email]; !ok {
 		return &account.AuthenticateResponse{
-			Success: false,
 			Account: nil,
 		}, errors.New("Account not found")
 	}
 
 	return &account.AuthenticateResponse{
-		Success: true,
 		Account: Accounts[in.Email],
 	}, nil
 }
