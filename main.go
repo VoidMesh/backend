@@ -3,6 +3,9 @@ package main
 import (
 	"log"
 	"net"
+	"os"
+	"os/signal"
+	"syscall"
 
 	"github.com/VoidMesh/backend/src/api/v1/account"
 	"github.com/VoidMesh/backend/src/api/v1/character"
@@ -19,6 +22,16 @@ func main() {
 	}
 
 	s := grpc.NewServer()
+
+	// Create a channel to listen for OS signals
+	c := make(chan os.Signal, 1)
+	signal.Notify(c, syscall.SIGINT, syscall.SIGTERM)
+	// call your cleanup method with this channel as a routine
+	go func() {
+		<-c
+		log.Println("Gracefully stopping the server")
+		s.GracefulStop()
+	}()
 
 	account.RegisterAccountSvcServer(s, &server.AccountServer{})
 	character.RegisterCharacterSvcServer(s, &server.CharacterServer{})
