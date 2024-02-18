@@ -6,10 +6,22 @@ import (
 	"log"
 
 	"github.com/VoidMesh/backend/src/api/v1/account"
+	"github.com/VoidMesh/backend/src/api/v1/character"
 	"github.com/google/uuid"
 )
 
-var Accounts = map[string]*account.Account{}
+// TODO: Add a database to store accounts
+var Accounts = map[string]*account.Account{
+	// TODO: Remove this test account
+	"void-mesh@alyx.pink": {
+		Id:    uuid.NewString(),
+		Email: "void-mesh@alyx.pink",
+		Characters: []*character.Character{
+			{Id: uuid.NewString(), Name: "Example 1"},
+			{Id: uuid.NewString(), Name: "Example 2"},
+		},
+	},
+}
 
 type AccountServer struct {
 	account.UnimplementedAccountSvcServer
