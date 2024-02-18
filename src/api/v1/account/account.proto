@@ -33,13 +33,11 @@ message GetRequest {
 
 // Responses
 message CreateResponse {
-  bool success = 1;
-  Account account = 2;
+  Account account = 1;
 }
 
 message AuthenticateResponse {
-  bool success = 1;
-  Account account = 2;
+  Account account = 1;
 }
 
 message GetResponse {
