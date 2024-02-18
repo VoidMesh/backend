@@ -21,9 +21,7 @@ func (s *CharacterServer) Create(ctx context.Context, in *character.CreateReques
 	log.Printf("Creating character: %v", in.Character.Name)
 
 	in.Character.Id = uuid.New().String()
-	in.Character.Inventory = &character.Inventory{
-		Resources: make(map[string]int64),
-	}
+	in.Character.Inventory = &character.Inventory{}
 	Characters[in.Character.Id] = in.Character
 
 	return &character.CreateResponse{Character: Characters[in.Character.Id]}, nil
@@ -46,7 +44,11 @@ func (s *CharacterServer) GatherResource(ctx context.Context, in *character.Gath
 
 	fmt.Printf("Gathering resource for character: %v", c)
 
-	c.Inventory.Resources[in.ResourceToGather.Id] += rand.Int63n(10) + rand.Int63n(100) + 5
+	for _, r := range c.Inventory.Resources {
+		if r.Resource.Id == in.ResourceToGather.Id {
+			r.Amount += rand.Int63n(10) + rand.Int63n(100) + 5
+		}
+	}
 
 	return &character.GatherResourceResponse{Character: c, Inventory: c.Inventory}, nil
 }

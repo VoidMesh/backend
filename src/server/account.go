@@ -17,8 +17,26 @@ var Accounts = map[string]*account.Account{
 		Id:    uuid.NewString(),
 		Email: "void-mesh@alyx.pink",
 		Characters: []*character.Character{
-			{Id: uuid.NewString(), Name: "Example 1"},
-			{Id: uuid.NewString(), Name: "Example 2"},
+			{
+				Id:   uuid.NewString(),
+				Name: "Example 1",
+				Inventory: &character.Inventory{
+					Resources: []*character.Resource{
+						{Resource: Resources[0], Amount: 100},
+						{Resource: Resources[1], Amount: 50},
+					},
+				},
+			},
+			{
+				Id:   uuid.NewString(),
+				Name: "Example 2",
+				Inventory: &character.Inventory{
+					Resources: []*character.Resource{
+						{Resource: Resources[0], Amount: 100},
+						{Resource: Resources[1], Amount: 50},
+					},
+				},
+			},
 		},
 	},
 }
