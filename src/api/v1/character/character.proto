@@ -13,7 +13,12 @@ message Character {
 }
 
 message Inventory {
-  map<string, int64> resources = 1; // Resource ID to amount.
+  repeated Resource resources = 1;
+}
+
+message Resource {
+  resource.Resource resource = 1;
+  int64 amount = 2;
 }
 
 service CharacterSvc {
@@ -53,6 +58,7 @@ message CreateResponse {
 
 message ReadResponse {
   Character character = 1;
+  resource.Resource resources = 2;
 }
 
 message UpdateResponse {
