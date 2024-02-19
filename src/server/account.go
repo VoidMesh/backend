@@ -10,10 +10,11 @@ import (
 )
 
 // TODO: Add a database to store accounts
-var StoredAccounts = map[string]*account.Account{
+var alyxAccountID = &account.UUID{Value: "06BD77BA-E52B-4287-A138-F0154752C701"}
+var StoredAccounts = []*account.Account{
 	// TODO: Remove this test account
-	"void-mesh@alyx.pink": {
-		Id:    &account.UUID{Value: uuid.NewString()},
+	{
+		Id:    alyxAccountID,
 		Email: "void-mesh@alyx.pink",
 	},
 }
@@ -25,7 +26,7 @@ type AccountServer struct {
 func (s *AccountServer) Create(ctx context.Context, in *account.CreateRequest) (*account.CreateResponse, error) {
 	log.Printf("Creating account using email: %s", in.Email)
 
-	if _, ok := StoredAccounts[in.Email]; ok {
+	if _, err := GetAccountByEmail(in.Email); err != nil {
 		return nil, errors.New("Account already exists")
 	}
 
@@ -33,21 +34,28 @@ func (s *AccountServer) Create(ctx context.Context, in *account.CreateRequest) (
 		Id:    &account.UUID{Value: uuid.NewString()},
 		Email: in.Email,
 	}
-	StoredAccounts[newAccount.Email] = &newAccount
+	StoredAccounts = append(StoredAccounts, &newAccount)
 	return &account.CreateResponse{Account: &newAccount}, nil
 }
 
 func (s *AccountServer) Authenticate(ctx context.Context, in *account.AuthenticateRequest) (*account.AuthenticateResponse, error) {
 	log.Printf("Authenticating: %v", in.Email)
+	var acc *account.Account
 
-	if _, ok := StoredAccounts[in.Email]; !ok {
-		return &account.AuthenticateResponse{
-			Account: nil,
-		}, errors.New("Account not found")
+	acc, err := GetAccountByEmail(in.Email)
+
+	if err != nil {
+		return &account.AuthenticateResponse{Account: nil}, err
 	}
-	log.Printf("ID for '%s': %s", in.Email, StoredAccounts[in.Email].Id.Value)
 
-	return &account.AuthenticateResponse{
-		Account: StoredAccounts[in.Email],
-	}, nil
+	return &account.AuthenticateResponse{Account: acc}, nil
+}
+
+func GetAccountByEmail(email string) (*account.Account, error) {
+	for _, acc := range StoredAccounts {
+		if acc.Email == email {
+			return acc, nil
+		}
+	}
+	return nil, errors.New("Account not found")
 }
