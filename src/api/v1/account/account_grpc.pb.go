@@ -21,7 +21,6 @@ const _ = grpc.SupportPackageIsVersion7
 const (
 	AccountSvc_Create_FullMethodName       = "/account.AccountSvc/Create"
 	AccountSvc_Authenticate_FullMethodName = "/account.AccountSvc/Authenticate"
-	AccountSvc_Get_FullMethodName          = "/account.AccountSvc/Get"
 )
 
 // AccountSvcClient is the client API for AccountSvc service.
@@ -30,7 +29,6 @@ const (
 type AccountSvcClient interface {
 	Create(ctx context.Context, in *CreateRequest, opts ...grpc.CallOption) (*CreateResponse, error)
 	Authenticate(ctx context.Context, in *AuthenticateRequest, opts ...grpc.CallOption) (*AuthenticateResponse, error)
-	Get(ctx context.Context, in *GetRequest, opts ...grpc.CallOption) (*GetResponse, error)
 }
 
 type accountSvcClient struct {
@@ -59,22 +57,12 @@ func (c *accountSvcClient) Authenticate(ctx context.Context, in *AuthenticateReq
 	return out, nil
 }
 
-func (c *accountSvcClient) Get(ctx context.Context, in *GetRequest, opts ...grpc.CallOption) (*GetResponse, error) {
-	out := new(GetResponse)
-	err := c.cc.Invoke(ctx, AccountSvc_Get_FullMethodName, in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 // AccountSvcServer is the server API for AccountSvc service.
 // All implementations must embed UnimplementedAccountSvcServer
 // for forward compatibility
 type AccountSvcServer interface {
 	Create(context.Context, *CreateRequest) (*CreateResponse, error)
 	Authenticate(context.Context, *AuthenticateRequest) (*AuthenticateResponse, error)
-	Get(context.Context, *GetRequest) (*GetResponse, error)
 	mustEmbedUnimplementedAccountSvcServer()
 }
 
@@ -87,9 +75,6 @@ func (UnimplementedAccountSvcServer) Create(context.Context, *CreateRequest) (*C
 }
 func (UnimplementedAccountSvcServer) Authenticate(context.Context, *AuthenticateRequest) (*AuthenticateResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Authenticate not implemented")
-}
-func (UnimplementedAccountSvcServer) Get(context.Context, *GetRequest) (*GetResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Get not implemented")
 }
 func (UnimplementedAccountSvcServer) mustEmbedUnimplementedAccountSvcServer() {}
 
@@ -140,24 +125,6 @@ func _AccountSvc_Authenticate_Handler(srv interface{}, ctx context.Context, dec 
 	return interceptor(ctx, in, info, handler)
 }
 
-func _AccountSvc_Get_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(AccountSvcServer).Get(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: AccountSvc_Get_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AccountSvcServer).Get(ctx, req.(*GetRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 // AccountSvc_ServiceDesc is the grpc.ServiceDesc for AccountSvc service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -172,10 +139,6 @@ var AccountSvc_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Authenticate",
 			Handler:    _AccountSvc_Authenticate_Handler,
-		},
-		{
-			MethodName: "Get",
-			Handler:    _AccountSvc_Get_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

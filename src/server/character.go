@@ -4,13 +4,28 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"math/rand"
 
+	"github.com/VoidMesh/backend/src/api/v1/account"
 	"github.com/VoidMesh/backend/src/api/v1/character"
 	"github.com/google/uuid"
 )
 
-var Characters = map[string]*character.Character{}
+// TODO: Add a database to store characters
+var alyxId = StoredAccounts["void-mesh@alyx.pink"].Id
+var StoredCharacters = map[*account.UUID][]*character.Character{
+	{Value: alyxId.Value}: {
+		{
+			Id:        &character.UUID{Value: uuid.NewString()},
+			AccountId: &account.UUID{Value: alyxId.Value},
+			Name:      "Example 1",
+		},
+		{
+			Id:        &character.UUID{Value: uuid.NewString()},
+			AccountId: &account.UUID{Value: alyxId.Value},
+			Name:      "Example 2",
+		},
+	},
+}
 
 type CharacterServer struct {
 	character.UnimplementedCharacterSvcServer
@@ -20,35 +35,24 @@ func (s *CharacterServer) Create(ctx context.Context, in *character.CreateReques
 	log.Printf("Received: %v", in.GetCharacter())
 	log.Printf("Creating character: %v", in.Character.Name)
 
-	in.Character.Id = uuid.New().String()
-	in.Character.Inventory = &character.Inventory{}
-	Characters[in.Character.Id] = in.Character
+	newCharacter := in.Character
+	newCharacter.Id = &character.UUID{Value: uuid.NewString()}
+	accountId := &account.UUID{Value: in.Character.AccountId.Value}
 
-	return &character.CreateResponse{Character: Characters[in.Character.Id]}, nil
+	StoredCharacters[accountId] = append(StoredCharacters[accountId], newCharacter)
+
+	return &character.CreateResponse{Character: newCharacter}, nil
 }
 
-func (s *CharacterServer) Read(ctx context.Context, in *character.ReadRequest) (*character.ReadResponse, error) {
-	log.Printf("Received character ID: %s", in.Id)
+func (s *CharacterServer) List(ctx context.Context, in *character.ListRequest) (*character.ListResponse, error) {
+	log.Printf("Listing characters for account '%s'", in.AccountId)
 
-	c := Characters[in.Id]
+	c := StoredCharacters[in.AccountId]
+	log.Printf("Listing characters '%v'", c)
 
 	if c == nil {
-		return nil, fmt.Errorf("Character not found")
+		return nil, fmt.Errorf("Characters not found")
 	}
 
-	return &character.ReadResponse{Character: c}, nil
-}
-
-func (s *CharacterServer) GatherResource(ctx context.Context, in *character.GatherResourceRequest) (*character.GatherResourceResponse, error) {
-	c := Characters[in.CharacterId]
-
-	fmt.Printf("Gathering resource for character: %v", c)
-
-	for _, r := range c.Inventory.Resources {
-		if r.Resource.Id == in.ResourceToGather.Id {
-			r.Amount += rand.Int63n(10) + rand.Int63n(100) + 5
-		}
-	}
-
-	return &character.GatherResourceResponse{Character: c, Inventory: c.Inventory}, nil
+	return &character.ListResponse{Characters: c}, nil
 }

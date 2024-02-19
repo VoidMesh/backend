@@ -9,6 +9,7 @@ import (
 
 	"github.com/VoidMesh/backend/src/api/v1/account"
 	"github.com/VoidMesh/backend/src/api/v1/character"
+	"github.com/VoidMesh/backend/src/api/v1/inventory"
 	"github.com/VoidMesh/backend/src/api/v1/resource"
 	"github.com/VoidMesh/backend/src/server"
 
@@ -35,6 +36,7 @@ func main() {
 
 	account.RegisterAccountSvcServer(s, &server.AccountServer{})
 	character.RegisterCharacterSvcServer(s, &server.CharacterServer{})
+	inventory.RegisterInventorySvcServer(s, &server.InventoryServer{})
 	resource.RegisterResourceSvcServer(s, &server.ResourceServer{})
 
 	log.Printf("server listening at %v", lis.Addr())

@@ -2,20 +2,19 @@ syntax = "proto3";
 
 package account;
 
-import "src/api/v1/character/character.proto";
 
 option go_package = "github.com/VoidMesh/backend/src/api/v1/account";
 
+message UUID { string value = 1; }
+
 message Account {
-  string id = 1;
+  UUID id = 1;
   string email = 2;
-  repeated character.Character characters = 3;
 }
 
 service AccountSvc {
   rpc Create(CreateRequest) returns (CreateResponse) {}
   rpc Authenticate(AuthenticateRequest) returns (AuthenticateResponse) {}
-  rpc Get(GetRequest) returns (GetResponse) {}
 }
 
 // Requests
@@ -27,19 +26,11 @@ message AuthenticateRequest {
   string email = 1;
 }
 
-message GetRequest {
-  Account account = 1;
-}
-
 // Responses
 message CreateResponse {
   Account account = 1;
 }
 
 message AuthenticateResponse {
-  Account account = 1;
-}
-
-message GetResponse {
   Account account = 1;
 }

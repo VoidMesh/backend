@@ -1,0 +1,34 @@
+syntax = "proto3";
+
+package inventory;
+
+import "src/api/v1/character/character.proto";
+import "src/api/v1/resource/resource.proto";
+
+option go_package = "github.com/VoidMesh/backend/src/api/v1/inventory";
+
+message UUID { string value = 1; }
+
+message Inventory {
+  UUID id = 1;
+  character.UUID character_id = 2;
+  repeated Slot slots = 3;
+}
+
+message Slot {
+  resource.Resource resource = 1;
+  int32 quantity = 2;
+}
+
+service InventorySvc {
+  rpc Read (ReadRequest) returns (ReadResponse) {}
+}
+
+message ReadRequest {
+  UUID id = 1;
+  character.UUID character_id = 2;
+}
+
+message ReadResponse {
+  Inventory inventory = 1;
+}
