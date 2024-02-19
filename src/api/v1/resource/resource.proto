@@ -4,8 +4,10 @@ package resource;
 
 option go_package = "github.com/VoidMesh/backend/src/api/v1/resource";
 
+message UUID { string value = 1; }
+
 message Resource {
-  string id = 1;
+  UUID id = 1;
   string name = 2;
   string description = 3;
 }
