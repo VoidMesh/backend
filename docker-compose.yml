@@ -10,15 +10,29 @@ services:
     environment:
       - DATABASE_URL=postgres://voidmesh:voidmesh@db:5432/voidmesh?sslmode=disable
     ports:
+      - "9000:9000"
       - "50051:50051"
     volumes:
       - ./:/src/
       - go_modules:/go/pkg/mod/
+    healthcheck:
+      test: "grpc-health-probe -addr=:50051 && nc -z localhost 9000"
+      interval: 1s
+      timeout: 10s
+      retries: 10
     depends_on:
       db:
         condition: service_healthy
         restart: true
     command: "air -c .air.docker-api.toml"
+
+  grpcui:
+    image: fullstorydev/grpcui:latest
+    depends_on:
+      api:
+        condition: service_healthy
+        restart: true
+    command: -plaintext api:50051
 
   sqlc:
     build:

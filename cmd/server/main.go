@@ -4,9 +4,13 @@ import (
 	"context"
 	"log"
 	"net"
+	"net/http"
 
 	"github.com/VoidMesh/backend/internal/pkg/services"
+	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/health"
+	"google.golang.org/grpc/health/grpc_health_v1"
 	"google.golang.org/grpc/reflection"
 )
 
@@ -21,19 +25,39 @@ func main() {
 	}
 	defer lis.Close()
 
+	// Create a new request multiplexer for grpc-gateway
+	mux := runtime.NewServeMux()
+
 	// Create a new gRPC server
-	s := grpc.NewServer()
-	defer s.GracefulStop()
+	grpcServer := grpc.NewServer()
+	defer grpcServer.GracefulStop()
 
 	// Register reflection service
-	reflection.Register(s)
+	reflection.Register(grpcServer)
+
+	// Register health check service
+	grpc_health_v1.RegisterHealthServer(grpcServer, health.NewServer())
 
 	// Register V1 services
-	services.RegisterV1(ctx, s)
+	services.RegisterV1gRPC(ctx, grpcServer)
+	services.RegisterV1HTTP(ctx, mux)
 
 	// Serve the gRPC server
-	log.Printf("server listening at %v", lis.Addr())
-	if err := s.Serve(lis); err != nil {
-		log.Fatalf("failed to serve: %v", err)
-	}
+	go func() {
+		log.Printf("server listening at %v", lis.Addr())
+		if err := grpcServer.Serve(lis); err != nil {
+			log.Fatalf("failed to serve: %v", err)
+		}
+	}()
+
+	// Serve the gRPC-Gateway server
+	go func() {
+		log.Printf("gateway listening at %v", ":9000")
+		if err := http.ListenAndServe(":9000", mux); err != nil {
+			log.Fatalf("failed to serve: %v", err)
+		}
+	}()
+
+	// Block forever (or until an interrupt signal is received)
+	select {}
 }
