@@ -101,7 +101,7 @@ COPY --chown=voidmesh:voidmesh --from=build /bin/server /opt/voidmesh/
 RUN go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
 RUN go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
 RUN go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-grpc-gateway@latest
-RUN go install github.com/cosmtrek/air@latest
+RUN go install github.com/bokwoon95/wgo@latest
 RUN go install github.com/grpc-ecosystem/grpc-health-probe@latest
 
 # Set the default target to be the final stage.

@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/VoidMesh/backend/internal/db"
-	v1 "github.com/VoidMesh/backend/internal/pkg/api/account/v1"
+	v1 "github.com/VoidMesh/backend/pkg/api/account/v1"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/jackc/pgx/v5"
 )

@@ -6,7 +6,7 @@ import (
 	"net"
 	"net/http"
 
-	"github.com/VoidMesh/backend/internal/pkg/services"
+	"github.com/VoidMesh/backend/internal/pkg/api/service"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/health"
@@ -39,8 +39,8 @@ func main() {
 	grpc_health_v1.RegisterHealthServer(grpcServer, health.NewServer())
 
 	// Register V1 services
-	services.RegisterV1gRPC(ctx, grpcServer)
-	services.RegisterV1HTTP(ctx, mux)
+	service.RegisterV1gRPC(ctx, grpcServer)
+	service.RegisterV1HTTP(ctx, mux)
 
 	// Serve the gRPC server
 	go func() {

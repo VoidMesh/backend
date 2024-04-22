@@ -1,7 +1,7 @@
 package character
 
 import (
-	v1 "github.com/VoidMesh/backend/internal/pkg/api/character/v1"
+	v1 "github.com/VoidMesh/backend/pkg/api/character/v1"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 

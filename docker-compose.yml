@@ -8,7 +8,7 @@ services:
     tty: true
     restart: on-failure
     environment:
-      - DATABASE_URL=postgres://voidmesh:voidmesh@db:5432/voidmesh?sslmode=disable
+      DATABASE_URL: "postgres://voidmesh:voidmesh@db:5432/voidmesh?sslmode=disable"
     ports:
       - "9000:9000"
       - "50051:50051"
@@ -24,7 +24,15 @@ services:
       db:
         condition: service_healthy
         restart: true
-    command: "air -c .air.docker-api.toml"
+    command: "wgo -dir ./internal/pkg/api/* go run ./cmd/server/"
+
+  proto:
+    build:
+      target: development
+    restart: on-failure
+    volumes:
+      - ./:/src/
+    command: "wgo -dir ./api/protobuf -file=.proto ./scripts/generate_protobuf.sh"
 
   grpcui:
     image: fullstorydev/grpcui:latest
@@ -38,11 +46,11 @@ services:
     build:
       target: development
     tty: true
-    restart: on-failure
+    restart: always
     volumes:
       - ./:/src/
       - go_modules:/go/pkg/mod/
-    command: "air -c .air.docker-sqlc.toml"
+    command: "wgo -file=sqlc.yaml -file=.sql -xfile=.go -dir ./internal/db sqlc generate -f /src/internal/db/sqlc.yaml"
 
   db:
     image: postgres:16-alpine

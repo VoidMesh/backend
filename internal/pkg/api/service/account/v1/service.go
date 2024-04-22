@@ -5,7 +5,7 @@ import (
 	"os"
 	"time"
 
-	v1 "github.com/VoidMesh/backend/internal/pkg/api/account/v1"
+	v1 "github.com/VoidMesh/backend/pkg/api/account/v1"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 

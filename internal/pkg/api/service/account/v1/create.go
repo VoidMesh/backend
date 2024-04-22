@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"github.com/VoidMesh/backend/internal/db"
-	v1 "github.com/VoidMesh/backend/internal/pkg/api/account/v1"
+	v1 "github.com/VoidMesh/backend/pkg/api/account/v1"
 	"golang.org/x/crypto/bcrypt"
 )
 
