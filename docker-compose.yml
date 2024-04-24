@@ -10,13 +10,12 @@ services:
     environment:
       DATABASE_URL: "postgres://voidmesh:voidmesh@db:5432/voidmesh?sslmode=disable"
     ports:
-      - "9000:9000"
-      - "50051:50051"
+      - "8080:8080"
     volumes:
       - ./:/src/
       - go_modules:/go/pkg/mod/
     healthcheck:
-      test: "grpc-health-probe -addr=:50051 && nc -z localhost 9000"
+      test: "grpc-health-probe -addr=:8080"
       interval: 1s
       timeout: 10s
       retries: 10
@@ -29,10 +28,10 @@ services:
   proto:
     build:
       target: development
-    restart: on-failure
+    restart: always
     volumes:
       - ./:/src/
-    command: "wgo -dir ./api/protobuf -file=.proto ./scripts/generate_protobuf.sh"
+    command: "wgo -dir ./api/proto -file=.proto buf lint /src/api/proto/ && buf generate /src/api/proto/"
 
   grpcui:
     image: fullstorydev/grpcui:latest
@@ -40,7 +39,7 @@ services:
       api:
         condition: service_healthy
         restart: true
-    command: -plaintext api:50051
+    command: -plaintext api:8080
 
   sqlc:
     build:
@@ -70,7 +69,7 @@ services:
   pgweb:
     image: sosedoff/pgweb
     ports:
-      - "8080:8081"
+      - "8081:8081"
     environment:
       - PGWEB_DATABASE_URL=postgres://voidmesh:voidmesh@db:5432/voidmesh?sslmode=disable
     depends_on:

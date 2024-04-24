@@ -3,61 +3,83 @@ package main
 import (
 	"context"
 	"log"
-	"net"
 	"net/http"
 
-	"github.com/VoidMesh/backend/internal/pkg/api/service"
-	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/health"
-	"google.golang.org/grpc/health/grpc_health_v1"
-	"google.golang.org/grpc/reflection"
+	"github.com/VoidMesh/backend/api/gen/go/account/v1/accountv1connect"
+	"github.com/VoidMesh/backend/api/gen/go/character/v1/characterv1connect"
+
+	"github.com/VoidMesh/backend/internal/service/account/v1"
+	"github.com/VoidMesh/backend/internal/service/character/v1"
+
+	"github.com/VoidMesh/backend/internal/db"
+
+	"connectrpc.com/grpchealth"
+	"connectrpc.com/grpcreflect"
+
+	"golang.org/x/net/http2"
+	"golang.org/x/net/http2/h2c"
 )
 
+// func oldmain() {
+// 	ctx, cancel := context.WithCancel(context.Background())
+// 	defer cancel()
+
+// 	// Create a listener on TCP port for gRPC server
+// 	lis, err := net.Listen("tcp", ":50051")
+// 	if err != nil {
+// 		log.Fatalf("failed to listen: %v\n", err)
+// 	}
+// 	defer lis.Close()
+
+// 	// Create a new gRPC server
+// 	grpcServer := grpc.NewServer()
+// 	defer grpcServer.GracefulStop()
+
+// 	// Register reflection service
+// 	reflection.Register(grpcServer)
+
+// 	// Register health check service
+// 	grpc_health_v1.RegisterHealthServer(grpcServer, health.NewServer())
+
+// 	// Register V1 services
+// 	service.RegisterV1(ctx, grpcServer)
+
+// 	// Serve the gRPC server
+// 	log.Printf("server listening at %v", lis.Addr())
+// 	if err := grpcServer.Serve(lis); err != nil {
+// 		log.Fatalf("failed to serve: %v", err)
+// 	}
+// }
+
 func main() {
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
+	ctx := context.Background()
 
-	// Create a listener on TCP port for gRPC server
-	lis, err := net.Listen("tcp", ":50051")
+	// Initialize database connection
+	db, err := db.NewDatabase(ctx)
 	if err != nil {
-		log.Fatalf("failed to listen: %v\n", err)
+		log.Fatalf("Failed to connect to database: %v", err)
 	}
-	defer lis.Close()
+	defer db.Close()
 
-	// Create a new request multiplexer for grpc-gateway
-	mux := runtime.NewServeMux()
+	mux := http.NewServeMux()
 
-	// Create a new gRPC server
-	grpcServer := grpc.NewServer()
-	defer grpcServer.GracefulStop()
+	mux.Handle(grpchealth.NewHandler(grpchealth.NewStaticChecker(serviceNames()...)))
+	mux.Handle(grpcreflect.NewHandlerV1(grpcreflect.NewStaticReflector(serviceNames()...)))
+	mux.Handle(grpcreflect.NewHandlerV1Alpha(grpcreflect.NewStaticReflector(serviceNames()...)))
 
-	// Register reflection service
-	reflection.Register(grpcServer)
+	mux.Handle(accountv1connect.NewAccountServiceHandler(&account.AccountServer{DB: db}))
+	mux.Handle(characterv1connect.NewCharacterServiceHandler(&character.CharacterServer{DB: db}))
 
-	// Register health check service
-	grpc_health_v1.RegisterHealthServer(grpcServer, health.NewServer())
+	http.ListenAndServe(
+		"0.0.0.0:8080",
+		// Use h2c so we can serve HTTP/2 without TLS.
+		h2c.NewHandler(mux, &http2.Server{}),
+	)
+}
 
-	// Register V1 services
-	service.RegisterV1gRPC(ctx, grpcServer)
-	service.RegisterV1HTTP(ctx, mux)
-
-	// Serve the gRPC server
-	go func() {
-		log.Printf("server listening at %v", lis.Addr())
-		if err := grpcServer.Serve(lis); err != nil {
-			log.Fatalf("failed to serve: %v", err)
-		}
-	}()
-
-	// Serve the gRPC-Gateway server
-	go func() {
-		log.Printf("gateway listening at %v", ":9000")
-		if err := http.ListenAndServe(":9000", mux); err != nil {
-			log.Fatalf("failed to serve: %v", err)
-		}
-	}()
-
-	// Block forever (or until an interrupt signal is received)
-	select {}
+func serviceNames() []string {
+	return []string{
+		accountv1connect.AccountServiceName,
+		characterv1connect.CharacterServiceName,
+	}
 }
