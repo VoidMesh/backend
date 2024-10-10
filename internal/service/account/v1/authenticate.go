@@ -73,7 +73,7 @@ func (s *AccountServer) Authenticate(ctx context.Context, req *connect.Request[v
 		ExpiresAt:    pgtype.Timestamp{Time: refreshTokenExpiresAt.Time, Valid: true},
 	})
 
-	// Return response)
+	// Return response
 	resp = connect.NewResponse(&v1.AuthenticateResponse{
 		Id:           fmt.Sprintf("%x", account.ID.Bytes),
 		IsActive:     account.IsActive.Bool,
